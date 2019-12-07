@@ -117,32 +117,6 @@ void permute(char *a, int l, int r) {
     }  
 }
 
-void permuteF(char *a, int l, int r) {
-    char temp;
-    // Base case  
-    if (l == r) {
-        strcpy(feedbackPhases[phaseNum++], a);
-    } else {  
-        // Permutations made  
-        for (int i = l; i <= r; i++) {
-            // Swapping done  
-            // swap(a[l], a[i]); 
-            temp = a[l];
-            a[l] = a[i];
-            a[i] = temp;
-  
-            // Recursion called  
-            permuteF(a, l+1, r);  
-  
-            //backtrack  
-            // swap(a[l], a[i]); 
-            temp = a[l];
-            a[l] = a[i];
-            a[i] = temp;
-        }  
-    }  
-}
-
 int amp(long long int *input, int length, int phase, long long int inp) {
     long long int current[1000];
     copy(input, current, length);
@@ -161,9 +135,6 @@ int runPhase(long long int *input, int length, char *phase) {
     for (i = 0; i < 5; i++) {
         nextInput = intcodeExec(currentAmp[i], length, phase[i] - '0', nextInput);
     }
-    // for (i = 0; i < 5; i++) {
-    //     nextInput = intcodeExec(currentAmp[i], length, feedbackPhase[i] - '0', nextInput);
-    // }
     return nextInput;
 };
 
@@ -173,6 +144,10 @@ int main() {
     long long int output;
     char p[6] = "01234";
     char fp[6] = "56789";
+    for(int i = 0; i < phaseNum; i++) {
+        printf("%s\n", phases[i]);
+        printf("%s\n", feedbackPhases[i]);
+    }
     while(scanf("%lld,", &input[length++]) != EOF);
     permute(p, 0, 4);
     // permuteF(fp, 0, 4);

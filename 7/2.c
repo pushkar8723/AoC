@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 char phases[120][6];
 int phaseNum = 0;
-char feedbackPhases[120][6];
 
 int getValue(long long int *input, int mode, int param) {
     if (mode == 1) {
@@ -22,8 +22,8 @@ void getValues(int code, long long int *address, int count, int start, long long
     }
 }
 
-int intcodeExec(long long int *address, int length, int phase, long long int input) {
-    int i = 0, opcode, modes;
+int intcodeExec(long long int *address, int length, int phase, long long int input, int *curr) {
+    int opcode, modes, i = *curr;
     long long int values[2];
     while(address[i] != 99) {
         opcode = address[i] % 100;
@@ -50,8 +50,9 @@ int intcodeExec(long long int *address, int length, int phase, long long int inp
             case 4:
                 getValues(modes, address, 1, i + 1, values);
                 // printf("Output: %d\n", values[0]);
-                return values[0];
                 i += 2;
+                *curr = i; 
+                return values[0];
                 break;
             case 5:
                 getValues(modes, address, 2, i + 1, values);
@@ -80,9 +81,10 @@ int intcodeExec(long long int *address, int length, int phase, long long int inp
                 i += 4;
                 break;
             default:
-                return -1;
+                exit(-1);
         }
     }
+    *curr = i;
     return -1;
 }
 
@@ -118,40 +120,8 @@ void permute(char *a, int l, int r) {
     }  
 }
 
-void permuteF(char *a, int l, int r) {
-    char temp;
-    // Base case  
-    if (l == r) {
-        strcpy(feedbackPhases[phaseNum++], a);
-    } else {  
-        // Permutations made  
-        for (int i = l; i <= r; i++) {
-            // Swapping done  
-            // swap(a[l], a[i]); 
-            temp = a[l];
-            a[l] = a[i];
-            a[i] = temp;
-  
-            // Recursion called  
-            permuteF(a, l+1, r);  
-  
-            //backtrack  
-            // swap(a[l], a[i]); 
-            temp = a[l];
-            a[l] = a[i];
-            a[i] = temp;
-        }  
-    }  
-}
-
-int amp(long long int *input, int length, int phase, long long int inp) {
-    long long int current[1000];
-    copy(input, current, length);
-    return intcodeExec(input, length, phase, inp);
-}
-
-int runPhase(long long int *input, int length, char *phase, char *feedbackPhase) {
-    int i;
+int runPhase(long long int *input, int length, char *phase) {
+    int i, ampCtrl[5] = { 0, 0, 0, 0, 0 };
     long long int nextInput = 0;
     long long int currentAmp[5][1000];
     copy(input, currentAmp[0], length);
@@ -160,10 +130,19 @@ int runPhase(long long int *input, int length, char *phase, char *feedbackPhase)
     copy(input, currentAmp[3], length);
     copy(input, currentAmp[4], length);
     for (i = 0; i < 5; i++) {
-        nextInput = intcodeExec(currentAmp[i], length, phase[i] - '0', nextInput);
+        nextInput = intcodeExec(currentAmp[i], length, phase[i] - '0', nextInput, &ampCtrl[i]);
     }
-    for (i = 0; i < 5; i++) {
-        nextInput = intcodeExec(currentAmp[i], length, feedbackPhase[i] - '0', nextInput);
+    while(1) {
+        long long int intermOpt = nextInput, sdf;
+        for (i = 0; i < 5; i++) {
+            sdf = intcodeExec(currentAmp[i], length, intermOpt, intermOpt, &ampCtrl[i]);
+            if (sdf != -1) {
+                intermOpt = sdf;
+            } else {
+                return nextInput;
+            }
+        }
+        nextInput = intermOpt;
     }
     return nextInput;
 };
@@ -172,18 +151,14 @@ int main() {
     long long int input[1000];
     int length = 0, max = 0;
     long long int output;
-    char p[6] = "01234";
-    char fp[6] = "56789";
     while(scanf("%lld,", &input[length++]) != EOF);
+    char p[6] = "56789";
     permute(p, 0, 4);
-    permuteF(fp, 0, 4);
     for (int i = 0; i < phaseNum; i++) {
-        for (int j = 0; j < phaseNum; j++) {
-            output = runPhase(input, length, phases[i], feedbackPhases[j]);
-            // printf("%lld\n", output);
-            if (max < output)
-                max = output;
-        }
+        output = runPhase(input, length, phases[i]);
+        printf("DEBUG PHASE: %s %lld\n", phases[i], output);
+        if (max < output)
+            max = output;
     }
     printf("%d\n", max);
     return 0;
