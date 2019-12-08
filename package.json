@@ -1,0 +1,26 @@
+{
+  "name": "aoc",
+  "version": "1.0.0",
+  "description": "Advent of Code setup",
+  "main": "scripts/cli.js",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "dotenv": "^8.2.0",
+    "inquirer": "^7.0.0",
+    "jsdom": "^15.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "cli": "node scripts/cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pushkar8723/AoC-2019.git"
+  },
+  "author": "pushkar8723@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pushkar8723/AoC-2019/issues"
+  },
+  "homepage": "https://github.com/pushkar8723/AoC-2019#readme"
+}

@@ -15,7 +15,7 @@ const countPixel = (layer) => {
 }
 
 process.stdin.on('data', function (chunk) {
-    const line = chunk.toString();
+    const line = chunk.toString().split('\n')[0];
     const layers = [];
     const height = 6;
     const width = 25;
