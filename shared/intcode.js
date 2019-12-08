@@ -3,7 +3,7 @@
  */
 function intcode(input) {
     /** Program to be executed. */
-    const program = input;
+    let program = input;
 
     /** Current address of the control */
     let control = 0;
@@ -88,7 +88,7 @@ function intcode(input) {
                  */
                 case 3:
                     if (inputs && inputs.length) {
-                        // console.log("Input received:", inputs[0]);
+                        console.log("Input received:", inputs[0]);
                         program[program[control + 1]] = inputs[0];
                         inputs.splice(0, 1);
                         control += 2;
@@ -153,7 +153,7 @@ function intcode(input) {
                  */
                 case 8:
                     values = getValues(modes, 2, control + 1);
-                    control[program[control + 3]] = (values[0] === values[1]) ? 1 : 0;
+                    program[program[control + 3]] = (values[0] === values[1]) ? 1 : 0;
                     control += 4;
                     break;
 
@@ -173,8 +173,14 @@ function intcode(input) {
         }
     }
 
+    const reset = (input) => {
+        program = input;
+        control = 0;
+    } 
+
     return {
-        exec
+        exec,
+        reset
     }
 }
 
