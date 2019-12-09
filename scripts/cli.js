@@ -99,15 +99,19 @@ const run = async (date, file, env) => {
         throw "File not found";
     }
     if (!fs.existsSync(`./${date}/input.txt`)) {
-        const resp = await axios.get(
-            `https://adventofcode.com/${env.AOC_YEAR}/day/${date}/input`,
-            {
-                headers: {
-                    cookie: env.AOC_COOKIE
-                },
-                responseType: 'arraybuffer'
-            });
-        fs.writeFileSync(`${date}/input.txt`, resp.data);
+        try {
+            const resp = await axios.get(
+                `https://adventofcode.com/${env.AOC_YEAR}/day/${date}/input`,
+                {
+                    headers: {
+                        cookie: env.AOC_COOKIE
+                    },
+                    responseType: 'arraybuffer'
+                });
+            fs.writeFileSync(`${date}/input.txt`, resp.data);
+        } catch (e) {
+            console.log(e);
+        }
     }
     const ext = file.split('.').slice(-1)[0];
     if (execCmd[ext]) {

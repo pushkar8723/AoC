@@ -22,3 +22,4 @@ I implemented following programs:
 - Common ancestor of two nodes in a tree
 - Distance between two nodes in a tree
 - Intersection of edges in a graph
+- All permutations of a string
