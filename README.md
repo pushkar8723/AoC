@@ -23,3 +23,6 @@ I implemented following programs:
 - Distance between two nodes in a tree
 - Intersection of edges in a graph
 - All permutations of a string
+- BFS Graph traversal
+- Calculating angle of a line from a axis
+- Dealt with 0 and -0 in JavaScript

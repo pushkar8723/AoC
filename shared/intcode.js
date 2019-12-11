@@ -114,7 +114,7 @@ function intcode(input) {
                  */
                 case 3:
                     if (inputs && inputs.length) {
-                        console.log("Input received:", inputs[0]);
+                        // console.log("Input received:", inputs[0]);
                         const position = getAddress(modes % 10, program[control + 1]);
                         program[position] = inputs[0];
                         inputs.splice(0, 1);
