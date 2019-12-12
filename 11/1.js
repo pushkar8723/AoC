@@ -63,7 +63,7 @@ process.stdin.on('data', function (chunk) {
     }
     for (j = minY; j <= maxY; j++) {
         for (i = minX; i <= maxX; i++) {
-            process.stdout.write(pannels[[i,j].toString()]  === 1? '#' : '.');
+            process.stdout.write(pannels[[i,j].toString()]  === 1? '#' : ' ');
         }
         process.stdout.write('\n');
     }
