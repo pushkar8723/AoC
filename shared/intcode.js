@@ -114,15 +114,15 @@ function intcode(input) {
                  */
                 case 3:
                     if (inputs && inputs.length) {
-                        // console.log("Input received:", inputs[0]);
+                        console.log("Input received:", inputs[0]);
                         const position = getAddress(modes % 10, program[control + 1]);
                         program[position] = inputs[0];
                         inputs.splice(0, 1);
                         control += 2;
                         break;
                     } else {
-                        console.log("Program waiting for input...");
-                        return { done: false };
+                        // console.log("Program waiting for input...");
+                        return { done: false, inputRequired: true };
                     }
 
                 /**
@@ -222,9 +222,25 @@ function intcode(input) {
         relativeBase = 0;
     } 
 
+    const getInternals = () => {
+        return {
+            program,
+            control,
+            relativeBase
+        }
+    }
+
+    const setInternals = (input) => {
+        program = input.program;
+        control = input.control;
+        relativeBase = input.relativeBase;
+    }
+
     return {
         exec,
-        reset
+        reset,
+        getInternals,
+        setInternals
     }
 }
 
