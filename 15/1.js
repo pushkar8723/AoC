@@ -14,7 +14,7 @@ const p = (x, y) => new point(x, y);
 const map = new WeakMap();
 let minX = 0, minY = 0, maxX= 0, maxY = 0, maxD = 0;;
 
-const revealMap = (internals) => {
+const revealMap = async (internals) => {
     const q = [];
     const directions = [[0, -1], [0, 1], [-1, 0], [1, 0]];
     q.push({
@@ -57,6 +57,9 @@ const revealMap = (internals) => {
                 }
             }
         }
+        // Comment out the line below to see the
+        // anser for first part :P 
+        await printMap(true);
     }
 }
 
@@ -86,18 +89,30 @@ const fillMap = () => {
     }
 }
 
-process.stdin.on('data', function (chunk) {
-    const input = chunk.toString().split('\n')[0].split(',').map(item => Number(item));
-    // Write your code here
-    map[p(0,0)] = '^';
-    const machine = new intcode(input.slice(0));
-    revealMap(machine.getInternals());
+const printMap = async (clear) => {
+    if (clear) {
+        process.stdout.write('\033c');
+    }
     for (let i = minX; i <= maxX; i++) {
         for (let j = minY; j <= maxY; j++) {
             process.stdout.write(map[p(i, j)] || '?');
         }
         process.stdout.write('\n');
     }
+    await new Promise((resolve) => {
+        setTimeout(() => {
+            resolve();
+        }, 50);
+    });
+}
+
+process.stdin.on('data', async function (chunk) {
+    const input = chunk.toString().split('\n')[0].split(',').map(item => Number(item));
+    // Write your code here
+    map[p(0,0)] = '^';
+    const machine = new intcode(input.slice(0));
+    await revealMap(machine.getInternals());
+    await printMap();
     maxD = 0;
     fillMap();
     console.log(maxD);
