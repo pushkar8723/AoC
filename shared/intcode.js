@@ -224,7 +224,7 @@ function intcode(input) {
 
     const getInternals = () => {
         return {
-            program,
+            program: program.slice(0),
             control,
             relativeBase
         }
