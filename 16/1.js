@@ -17,6 +17,17 @@ const calcPhase = (input, phase) => {
     return output;
 }
 
+const calcLastSum = (input) => {
+    let sum = 0;
+    let output = '';
+    for (let i = 0; i < input.length; i++) {
+        sum += input[i];
+        output += Number(sum % 10);
+    }
+    // console.log(output);
+    return output;
+}
+
 process.stdin.on('data', function (chunk) {
     const input = chunk.toString().split('\n')[0];
     // Write your code here
@@ -32,10 +43,11 @@ process.stdin.on('data', function (chunk) {
     for (let i = 0; i < 10000; i++) {
         part2Input += input;
     }
+    part2Input = part2Input.slice(Number(part2Input.slice(0,7)));
+    part2Input = part2Input.split('').reverse().join('');
     nextInput = part2Input;
-    for (let i = 0; i < 100; i++) {
-        console.log("Processing", i + 1);
-        nextInput = calcPhase(nextInput.split('').map(item => Number(item)), phase);
+    for(let i = 0; i < 100; i++) {
+        nextInput = calcLastSum(nextInput.split('').map(item => Number(item)));
     }
-    console.log(nextInput.slice(nextInput.slice(0, 7), 8))
+    console.log(nextInput.split('').reverse().join('').slice(0, 8));
 });
