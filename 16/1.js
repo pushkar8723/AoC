@@ -24,6 +24,18 @@ process.stdin.on('data', function (chunk) {
     let nextInput = input;
     for (let i = 0; i < 100; i++) {
         nextInput = calcPhase(nextInput.split('').map(item => Number(item)), phase);
-        console.log(i, nextInput);
+        // console.log(i, nextInput);
     }
+    console.log(nextInput.slice(0, 8))
+
+    let part2Input = '';
+    for (let i = 0; i < 10000; i++) {
+        part2Input += input;
+    }
+    nextInput = part2Input;
+    for (let i = 0; i < 100; i++) {
+        console.log("Processing", i + 1);
+        nextInput = calcPhase(nextInput.split('').map(item => Number(item)), phase);
+    }
+    console.log(nextInput.slice(nextInput.slice(0, 7), 8))
 });
