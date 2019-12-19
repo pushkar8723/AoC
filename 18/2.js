@@ -12,10 +12,10 @@ function point(x, y) {
 const p = (x, y) => new point(x, y);
 
 let keyCount = 0;
-const memo = {};
+let memo = {};
 const state = (sp, keys) => `${sp.toString()}:${keys.sort().join('')}`;
 
-const findPath = (sp, keys = []) => {
+const findPath = (sp, keys = [], kc, ignoreDoors = false) => {
     // console.log(d, keys.join(''))
     if (memo[state(sp, keys)]) {
         // console.log('reused!', sp.toString(), keys.join());
@@ -39,13 +39,13 @@ const findPath = (sp, keys = []) => {
 
         if (map[c.p] >= 'a' && map[c.p] <= 'z' && !c.k.includes(map[c.p])) {
             c.k.push(map[c.p]);
-            if (c.k.length === keyCount) {
+            if (c.k.length === kc) {
                 if (c.d < shortestPath) {
                     shortestPath = c.d;
                 }
             } else {
                 // console.log(c.p.toString(), c.d, [...c.k].join(''));
-                const subPath = findPath(c.p, [...c.k]);
+                const subPath = findPath(c.p, [...c.k], kc, ignoreDoors);
                 if (subPath + c.d < shortestPath) {
                     shortestPath = subPath + c.d;
                 }
@@ -54,7 +54,7 @@ const findPath = (sp, keys = []) => {
 
         for (const move of moves) {
             if (map[move] !== '#' && map[move] !== undefined && !visited.has(move.toString())) {
-                if (map[move] >= 'A' && map[move] <= 'Z') {
+                if (!ignoreDoors && (map[move] >= 'A' && map[move] <= 'Z')) {
                     if (c.k.includes(map[move].toLowerCase())) {
                         q.push({
                             p: move,
@@ -77,6 +77,32 @@ const findPath = (sp, keys = []) => {
     return shortestPath;
 }
 
+const getAllKeys = (sp) => {
+    const q = [sp];
+    const visited = new Set();
+    const keys = [];
+    while(q.length) {
+        const c = q.splice(0, 1)[0];
+        visited.add(c.toString());
+
+        if (map[c] >= 'a' && map[c] <= 'z') {
+            keys.push(map[c]);
+        }
+
+        const down = p(c.x + 1, c.y);
+        const right = p(c.x, c.y + 1);
+        const up = p(c.x - 1, c.y);
+        const left = p(c.x, c.y - 1);
+        const moves = [up, down, left, right];
+        for (const move of moves) {
+            if (map[move] !== '#' && map[move] !== undefined && !visited.has(move.toString())) {
+                q.push(move)
+            }
+        }
+    }
+    return keys;
+}
+
 process.stdin.on('data', function (chunk) {
     const lines = chunk.toString().split('\n');
     // Write your code here
@@ -93,5 +119,30 @@ process.stdin.on('data', function (chunk) {
             }
         }
     }
-    console.log(findPath(startPoint));
+    console.log(findPath(startPoint, [], keyCount));
+
+    map[p(startPoint.x - 1, startPoint.y - 1)] = '@';
+    map[p(startPoint.x - 1, startPoint.y)] = '#';
+    map[p(startPoint.x - 1, startPoint.y + 1)] = '@';
+    map[p(startPoint.x, startPoint.y - 1)] = '#';
+    map[p(startPoint.x, startPoint.y)] = '#';
+    map[p(startPoint.x, startPoint.y + 1)] = '#';
+    map[p(startPoint.x + 1, startPoint.y - 1)] = '@';
+    map[p(startPoint.x + 1, startPoint.y)] = '#';
+    map[p(startPoint.x + 1, startPoint.y + 1)] = '@';
+    
+    memo = {};
+    const p1 = p(startPoint.x - 1, startPoint.y - 1);
+    const k1 = getAllKeys(p1)
+    const m1 = findPath(p1, [], k1.length, true);
+    const p2 = p(startPoint.x - 1, startPoint.y + 1);
+    const k2 = getAllKeys(p2)
+    const m2 = findPath(p2, [], k2.length, true);
+    const p3 = p(startPoint.x + 1, startPoint.y - 1);
+    const k3 = getAllKeys(p3)
+    const m3 = findPath(p3, [], k3.length, true);
+    const p4 = p(startPoint.x + 1, startPoint.y + 1);
+    const k4 = getAllKeys(p4)
+    const m4 = findPath(p4, [], k4.length, true);
+    console.log(m1 + m2 + m3 + m4);
 });
