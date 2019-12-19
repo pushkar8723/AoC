@@ -12,16 +12,22 @@ function point(x, y) {
 const p = (x, y) => new point(x, y);
 
 let keyCount = 0;
-let shortestPath = Infinity;
+const memo = {};
+const state = (sp, keys) => `${sp.toString()}:${keys.sort().join('')}`;
 
-const findPath = (sp, d=0, keys = []) => {
-    console.log(d, keys.join(''))
+const findPath = (sp, keys = []) => {
+    // console.log(d, keys.join(''))
+    if (memo[state(sp, keys)]) {
+        // console.log('reused!', sp.toString(), keys.join());
+        return memo[state(sp, keys)];
+    }
     const q = [{
         p: sp,
-        d: d,
+        d: 0,
         k: [...keys]
     }];
     const visited = new Set();
+    let shortestPath = Infinity;
     while (q.length) {
         const c = q.splice(0, 1)[0];
         visited.add(c.p.toString());
@@ -38,8 +44,11 @@ const findPath = (sp, d=0, keys = []) => {
                     shortestPath = c.d;
                 }
             } else {
-                console.log(c.p, c.d, [...c.k]);
-                findPath(c.p, c.d, [...c.k]);
+                // console.log(c.p.toString(), c.d, [...c.k].join(''));
+                const subPath = findPath(c.p, [...c.k]);
+                if (subPath + c.d < shortestPath) {
+                    shortestPath = subPath + c.d;
+                }
             }
         }
 
@@ -63,6 +72,9 @@ const findPath = (sp, d=0, keys = []) => {
             }
         }
     }
+    memo[state(sp, keys)] = shortestPath;
+    // console.log('saved!', sp.toString(), keys.join());
+    return shortestPath;
 }
 
 process.stdin.on('data', function (chunk) {
@@ -81,6 +93,5 @@ process.stdin.on('data', function (chunk) {
             }
         }
     }
-    findPath(startPoint);
-    console.log(shortestPath);
+    console.log(findPath(startPoint));
 });
