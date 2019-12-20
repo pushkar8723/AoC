@@ -21,7 +21,7 @@ const mapAllPortals = () => {
 }
 
 const getPortalKey = (portal, p) => {
-    return (portals[portal][0].toString() === p.toString())
+    return (p.x === 0 || p.y === 0 || p.x === maxX - 1 || p.y === maxY - 1)
         ? `${portal}B`
         : `${portal}O`;
 }
@@ -91,6 +91,50 @@ const getMinDistance = (start, end, visited = []) => {
     return minDistance;
 }
 
+const isValidEdge = (e, level) => {
+    // console.log(e.substring(0, 2));
+    if (e.substring(0, 2) !== 'AA' && e.substring(0, 2) !== 'ZZ') {
+        return true;
+    } else {
+        if (level === 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+const getMinDistance2 = (start, end) => {
+    const q = [{
+        p: start,
+        level: 0,
+        d: 0
+    }];
+    const visited = new Set();
+    while(q.length) {
+        const curr = q.splice(0, 1)[0];
+        // console.log(curr);
+        visited.add(`${curr.p}${curr.level}`);
+        const edges = graph[curr.p];
+        Object.keys(edges).forEach(edge => {
+            if (isValidEdge(edge, curr.level) && !visited.has(`${edge}${curr.level}`)) {
+                if (edge === end && curr.level === 0) {
+                    console.log(curr.d + edges[edge]);
+                    process.exit();
+                } else {
+                    const nextLevel = edge.substring(2) === 'B' ? curr.level - 1 : curr.level + 1;
+                    if (nextLevel >= 0) {
+                        q.push({
+                            p: getOtherEnd(edge),
+                            level: nextLevel,
+                            d: curr.d + edges[edge] + 1
+                        });
+                    }
+                }
+            }
+        });
+    }
+}
+
 process.stdin.on('data', function (chunk) {
     const lines = chunk.toString().slice(0, -1).split('\n');
     // Write your code here
@@ -135,5 +179,7 @@ process.stdin.on('data', function (chunk) {
             graph[getPortalKey(p, point)] = bfs(point);
         });
     });
+    // console.log(graph);
     console.log(getMinDistance('AAB', 'ZZB'));
+    getMinDistance2('AAB', 'ZZB');
 });
