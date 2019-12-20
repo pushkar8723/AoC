@@ -20,6 +20,77 @@ const mapAllPortals = () => {
     }
 }
 
+const getPortalKey = (portal, p) => {
+    return (portals[portal][0].toString() === p.toString())
+        ? `${portal}B`
+        : `${portal}O`;
+}
+
+const bfs = (sp) => {
+    const q = [{
+        p: sp,
+        d: 0
+    }];
+    const dists = {};
+    const visited = new Set();
+    while(q.length) {
+        const curr = q.splice(0, 1)[0];
+        visited.add(curr.p.toString());
+        if (map[curr.p].length === 2 && curr.p !== sp) {
+            dists[getPortalKey(map[curr.p], curr.p)] = curr.d;
+        }
+
+        const up = p(curr.p.x - 1, curr.p.y);
+        const down = p(curr.p.x + 1, curr.p.y);
+        const left = p(curr.p.x, curr.p.y - 1);
+        const right = p(curr.p.x, curr.p.y + 1);
+        const moves = [up, down, left, right];
+
+        for (const move of moves) {
+            if (
+                map[move] !== ' ' && map[move] !== undefined &&
+                map[move] !== '#' && !visited.has(move.toString())
+            ) {
+                q.push({
+                    p: move,
+                    d: curr.d + 1
+                });
+            }
+        }
+    }
+    return dists;
+}
+
+const graph = {};
+
+const getOtherEnd = (portal) => {
+    if (portal.substring(0, 2) === 'AA' || portal.substring(0, 2) === 'ZZ') {
+        return portal;
+    }
+    return `${portal.substring(0, 2)}${portal.substring(2) === 'B' ? 'O' : 'B'}`;
+}
+
+const getMinDistance = (start, end, visited = []) => {
+    const edges = graph[start];
+    let minDistance = Infinity;
+    visited.push(start);
+    Object.keys(edges).forEach(edge => {
+        if (!visited.includes(edge)) {
+            if (edge === end) {
+                if (edges[edge] < minDistance) {
+                    minDistance = edges[edge];
+                }
+            } else {
+                const distance = edges[edge] + getMinDistance(getOtherEnd(edge), end, [...visited, edge]) + 1;
+                if (distance < minDistance) {
+                    minDistance = distance;
+                }
+            }
+        }
+    });
+    return minDistance;
+}
+
 process.stdin.on('data', function (chunk) {
     const lines = chunk.toString().slice(0, -1).split('\n');
     // Write your code here
@@ -58,5 +129,11 @@ process.stdin.on('data', function (chunk) {
     //     process.stdout.write('\n');
     // }
     mapAllPortals();
-    console.log(portals);
+    const ps = Object.keys(portals);
+    ps.forEach(p => {
+        portals[p].forEach(point => {
+            graph[getPortalKey(p, point)] = bfs(point);
+        });
+    });
+    console.log(getMinDistance('AAB', 'ZZB'));
 });
