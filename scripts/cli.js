@@ -8,7 +8,8 @@ dotenv.config();
 
 const execCmd = {
     js: (dir, file, input) => `node ${dir}/${file} < ${dir}/${input}`,
-    c: (dir, file, input) => `cc ${dir}/${file} && ./a.out < ${dir}/${input}`
+    c: (dir, file, input) => `cc ${dir}/${file} && ./a.out < ${dir}/${input}`,
+    py: (dir, file, input) => `python ${dir}/${file} < ${dir}/${input}`
 }
 
 const init = async () => {
