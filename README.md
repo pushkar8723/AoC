@@ -14,7 +14,28 @@ For example, your input is saved in `input.txt`. Run following command in termin
 node 1.js < input.txt
 ```
 
-### What all did I learn by this exercise?
+There is another way to eaisily run these programs (but it requires you to trust me :p).
+Run following commands to set up
+```
+npm i
+npm run cli init
+```
+
+It will ask you for the year (enter 2019), and your cookie (This is where you need to trust me).
+You can get your cookie from browser console.
+
+`Open adventofcode.com > Right click > inspect > Network Tab > select first request > Headers Tab`.
+
+Under `Request Headers` section you will find your cookie. This cookie will be used to automatically 
+fetch your input when you run a program.
+
+To run a program enter following command
+
+```
+npm run cli run <day> <program file (1.js)>
+```
+
+### What all did I learn / implemented in this exercise?
 
 I implemented following programs:
 - An intcode execution module which is used across problems.
@@ -26,3 +47,11 @@ I implemented following programs:
 - BFS Graph traversal
 - Calculating angle of a line from a axis
 - Dealt with 0 and -0 in JavaScript
+- Got introduced to Modular Arithmetic
+- Implemented Game of life
+- Traversed Inifinite Graph
+- Traversed Unknown Graph
+- Calculated slope of line
+- Created visualizations for some levels
+- Implemented Top Down Memorization (Dynamic Programming)
+- Simulated Distributed Network
