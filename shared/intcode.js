@@ -231,7 +231,7 @@ function intcode(input) {
     }
 
     const setInternals = (input) => {
-        program = input.program;
+        program = input.program.slice(0);
         control = input.control;
         relativeBase = input.relativeBase;
     }
