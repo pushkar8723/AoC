@@ -43,14 +43,17 @@ process.stdin.on('data', function (chunk) {
         }
     }
 
-    const reqRegEx = solve(0);
-    let count = 0;
-    messages.forEach(msg => {
-        if (Boolean(msg.match(new RegExp(`^${reqRegEx}$`)))) {
-            count++;
-        }
-    });
-    console.log(count);
+    const countMatches = (regEx) => {
+        let count = 0;
+        messages.forEach(msg => {
+            if (Boolean(msg.match(new RegExp(`^${regEx}$`)))) {
+                count++;
+            }
+        });
+        return count;
+    }
+
+    console.log(countMatches(solve(0)));
 
     map.set(8, '42 | 42 42 | 42 42 42 | 42 42 42 42 | 42 42 42 42 42 | 42 42 42 42 42 42 | 42 42 42 42 42 42 42');
     map.set(11, '42 31 | 42 42 31 31 | 42 42 42 31 31 31 | 42 42 42 42 31 31 31 31 | 42 42 42 42 42 31 31 31 31 31 | 42 42 42 42 42 42 31 31 31 31 31 31');
@@ -58,13 +61,6 @@ process.stdin.on('data', function (chunk) {
     solved.delete(0);
     solved.delete(8);
     solved.delete(11);
-    const reqRegEx2 = solve(0);
-
-    let p2 = 0;
-    messages.forEach(msg => {
-        if (Boolean(msg.match(new RegExp(`^${reqRegEx2}$`)))) {
-            p2++;
-        }
-    });
-    console.log(p2);
+    
+    console.log(countMatches(solve(0)));
 });
