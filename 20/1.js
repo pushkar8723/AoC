@@ -13,7 +13,7 @@ process.stdin.on('data', function (chunk) {
     }
 
     tiles.forEach(tile => {
-        const lines = tile.split('\n');
+        const lines = tile.split('\n').filter(item => item);
         const id = parseInt(lines[0].split(' ')[1]);
         lines.shift();
         const img = lines.map(line => line.split(''));
@@ -68,8 +68,7 @@ process.stdin.on('data', function (chunk) {
 
     console.log(ans);
 
-    const rotateLeft = (id) => {
-        const { img, borders } = map.get(id);
+    const rotateImg = (img) => {
         const size = img.length;
         const newImg = Array(size).fill(null).map(() => Array(size));
         for (let i = 0; i < size; i++) {
@@ -77,6 +76,34 @@ process.stdin.on('data', function (chunk) {
                 newImg[i][j] = img[j][size - i - 1];
             }
         }
+        return newImg;
+    }
+
+    const flipImgX = (img) => {
+        const size = img.length;
+        const newImg = Array(size).fill(null).map(() => Array(size));
+        for (let i = 0; i < size; i++) {
+            for (let j = 0; j < size; j++) {
+                newImg[i][j] = img[i][size - j - 1];
+            }
+        }
+        return newImg;
+    }
+
+    const flipImgY = (img) => {
+        const size = img.length;
+        const newImg = Array(size).fill(null).map(() => Array(size));
+        for (let i = 0; i < size; i++) {
+            for (let j = 0; j < size; j++) {
+                newImg[i][j] = img[size - i - 1][j];
+            }
+        }
+        return newImg;
+    }
+
+    const rotateLeft = (id) => {
+        const { img, borders } = map.get(id);
+        const newImg = rotateImg(img);
         map.set(id, {
             img: newImg,
             borders: {
@@ -105,13 +132,7 @@ process.stdin.on('data', function (chunk) {
 
     const flipX = (id) => {
         const { img, borders } = map.get(id);
-        const size = img.length;
-        const newImg = Array(size).fill(null).map(() => Array(size));
-        for (let i = 0; i < size; i++) {
-            for (let j = 0; j < size; j++) {
-                newImg[i][j] = img[i][size - j - 1];
-            }
-        }
+        const newImg = flipImgX(img);
         map.set(id, {
             img: newImg,
             borders: {
@@ -140,13 +161,7 @@ process.stdin.on('data', function (chunk) {
 
     const flipY = (id) => {
         const { img, borders } = map.get(id);
-        const size = img.length;
-        const newImg = Array(size).fill(null).map(() => Array(size));
-        for (let i = 0; i < size; i++) {
-            for (let j = 0; j < size; j++) {
-                newImg[i][j] = img[size - i - 1][j];
-            }
-        }
+        const newImg = flipImgY(img);
         map.set(id, {
             img: newImg,
             borders: {
@@ -201,12 +216,6 @@ process.stdin.on('data', function (chunk) {
         if (y + 1 < gridSize) {
             validNeighbors.push('right');
         }
-        // console.log(id, fit.get(id), validNeighbors);
-
-        // console.log(fit.get(id));
-        // rotateLeft(id);
-        // console.log(fit.get(id));
-        // break;
 
         let i = 0;
         while (i < 4) {
@@ -219,34 +228,29 @@ process.stdin.on('data', function (chunk) {
                 if (parent === 'top') {
                     if (parentItem.borders.bottom === item.borders.top) {
                         flipX(id);
-                        // console.log('flipX');
                         continue;
                     }
                 }
                 if (parent === 'bottom') {
                     if (parentItem.borders.top === item.borders.bottom) {
                         flipX(id);
-                        // console.log('flipX');
                         continue;
                     }
                 }
                 if (parent === 'left') {
                     if (parentItem.borders.right === item.borders.left) {
                         flipY(id);
-                        // console.log('flipY');
                         continue;
                     }
                 }
                 if (parent === 'right') {
                     if (parentItem.borders.left === item.borders.right) {
                         flipY(id);
-                        // console.log('flipY');
                         continue;
                     }
                 }
             }
 
-            // console.log(fit.get(id), neighbors.sort().join(','), validNeighbors.sort().join(','), gridSize, x, y);
             if (neighbors.sort().join(',') === validNeighbors.sort().join(',')) {
                 if (!parent) {
                     break;
@@ -256,9 +260,6 @@ process.stdin.on('data', function (chunk) {
             }
 
             rotateLeft(id);
-            // neighbors = Object.keys(fit.get(id));
-            // console.log(neighbors.sort().join(',') === validNeighbors.sort().join(','));
-            // break;
             i++;
         }
 
@@ -283,14 +284,9 @@ process.stdin.on('data', function (chunk) {
                 visited.add(edges[neighbor]);
             }
         });
-        // console.log(q);
-        // break;
-        // console.log(id, grid, q);
     }
 
-    // console.log(grid);
-
-    const bigImage = Array(gridSize * 8).fill(null).map(() => Array(gridSize * 8));
+    let bigImage = Array(gridSize * 8).fill(null).map(() => Array(gridSize * 8));
     for (let i = 0; i < gridSize; i++) {
         for (let j = 0; j < gridSize; j++) {
             for (let x = 1; x < 9; x++) {
@@ -300,5 +296,50 @@ process.stdin.on('data', function (chunk) {
             }
         }
     }
-    print(bigImage);
+
+    let hashCount = 0;
+    for (let i = 0; i < bigImage.length; i++) {
+        for (let j = 0; j < bigImage[i].length; j++) {
+            if (bigImage[i][j] === '#') {
+                hashCount++;
+            }
+        }
+    }
+
+    const monster = [
+        /..................#./,
+        /#....##....##....###/,
+        /.#..#..#..#..#..#.../,
+    ]
+    for (let i = 0; i < 3; i++) {
+        if (i === 1) {
+            bigImage = flipImgX(bigImage);
+        } else if (i === 2) {
+            bigImage = flipImgX(bigImage);
+            bigImage = flipImgY(bigImage);
+        }
+        for (let j = 0; j < 4; j++) {
+            let count = 0;
+            for (let x = 0; x < bigImage.length - 3; x++) {
+                for (let y = 0; y < bigImage[x].length - 20; y++) {
+                    const area = [
+                        bigImage[x].slice(y, y + 20).join(''),
+                        bigImage[x + 1].slice(y, y + 20).join(''),
+                        bigImage[x + 2].slice(y, y + 20).join(''),
+                    ]
+                    if (
+                        area[0].match(monster[0]) &&
+                        area[1].match(monster[1]) &&
+                        area[2].match(monster[2])
+                    ) {
+                        count++;
+                    }
+                }
+            }
+            bigImage = rotateImg(bigImage);
+            if (count > 0) {
+                console.log(hashCount - (15 * count));
+            }
+        }
+    }
 });
