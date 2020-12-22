@@ -8,7 +8,7 @@ process.stdin.on('data', function (chunk) {
     player1.shift();
     const player2 = decks[1].split('\n').filter(item => item).map(i => parseInt(i));
     player2.shift();
-    console.log(player1, player2);
+    // console.log(player1, player2);
     while (player1.length !== 0 && player2.length !== 0) {
         const p1 = player1.shift();
         const p2 = player2.shift();
@@ -20,7 +20,7 @@ process.stdin.on('data', function (chunk) {
             player2.push(p1);
         }
     }
-    let winner;
+
     let winner;
     if (player1.length !== 0) {
         winner = player1;
