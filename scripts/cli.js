@@ -35,7 +35,7 @@ const init = async () => {
     console.log("Init successful");
 }
 
-const add = async () => {
+const add = async (env) => {
     const answers = await inquirer.prompt([{
         type: 'number',
         name: 'date',
@@ -58,17 +58,17 @@ const add = async () => {
             }));
         }
     }]);
-    if (!fs.existsSync(`./${answers.date}`)) {
-        fs.mkdirSync(`./${answers.date}`);
+    if (!fs.existsSync(`./${env.AOC_YEAR}/${answers.date}`)) {
+        fs.mkdirSync(`./${env.AOC_YEAR}/${answers.date}`, { recursive: true });
     }
-    const files = fs.readdirSync(`./${answers.date}`);
+    const files = fs.readdirSync(`./${env.AOC_YEAR}/${answers.date}`);
     const ext = answers.template.split('.').slice(-1)[0];
     const fileNumber = files.filter(file => file.split('.').slice(-1)[0] === ext)
                             .map(file => Number(file.split('.').slice(0, 1)[0]))
                             .sort((a, b) => b - a);
     fs.copyFileSync(
         `./scripts/templates/${answers.template}`,
-        `./${answers.date}/${(fileNumber[0] || 0) + 1}.${ext}`
+        `./${env.AOC_YEAR}/${answers.date}/${(fileNumber[0] || 0) + 1}.${ext}`
     );
 }
 
@@ -78,13 +78,13 @@ const run = async (date, file, env) => {
             type: 'list',
             name: 'date',
             message: 'Select Folder:',
-            choices: () => fs.readdirSync('.', { withFileTypes: true })
+            choices: () => fs.readdirSync(`./${env.AOC_YEAR}`, { withFileTypes: true })
                                 .filter(dirent => dirent.isDirectory())
                                 .map(dirent => dirent.name)
         }]);
         date = answers.date;
     }
-    if (!fs.existsSync(`./${date}`)) {
+    if (!fs.existsSync(`./${env.AOC_YEAR}/${date}`)) {
         throw "Folder not found";
     }
     if (!file) {
@@ -92,14 +92,14 @@ const run = async (date, file, env) => {
             type: 'list',
             name: 'file',
             message: 'Select File:',
-            choices: () => fs.readdirSync(`./${date}`)
+            choices: () => fs.readdirSync(`./${env.AOC_YEAR}/${date}`)
         }]);
         file = answers.file;
     }
-    if (!fs.existsSync(`./${date}/${file}`)) {
+    if (!fs.existsSync(`./${env.AOC_YEAR}/${date}/${file}`)) {
         throw "File not found";
     }
-    if (!fs.existsSync(`./${date}/input.txt`)) {
+    if (!fs.existsSync(`./${env.AOC_YEAR}/${date}/input.txt`)) {
         try {
             const resp = await axios.get(
                 `https://adventofcode.com/${env.AOC_YEAR}/day/${date}/input`,
@@ -109,76 +109,14 @@ const run = async (date, file, env) => {
                     },
                     responseType: 'arraybuffer'
                 });
-            fs.writeFileSync(`${date}/input.txt`, resp.data);
+            fs.writeFileSync(`${env.AOC_YEAR}/${date}/input.txt`, resp.data);
         } catch (e) {
             console.log(e);
         }
     }
     const ext = file.split('.').slice(-1)[0];
     if (execCmd[ext]) {
-        const child = exec(execCmd[ext](date, file, 'input.txt'));
-        child.stdout.pipe(process.stdout);
-        child.stderr.pipe(process.stderr);
-    } else {
-        throw "Don't know how to run this file :(";
-    }
-}
-
-const runTest = async (date, file, env) => {
-    if (!date) {
-        const answers = await inquirer.prompt([{
-            type: 'list',
-            name: 'date',
-            message: 'Select Folder:',
-            choices: () => fs.readdirSync('.', { withFileTypes: true })
-                                .filter(dirent => dirent.isDirectory())
-                                .map(dirent => dirent.name)
-        }]);
-        date = answers.date;
-    }
-    if (!fs.existsSync(`./${date}`)) {
-        throw "Folder not found";
-    }
-    if (!file) {
-        const answers = await inquirer.prompt([{
-            type: 'list',
-            name: 'file',
-            message: 'Select File:',
-            choices: () => fs.readdirSync(`./${date}`)
-        }]);
-        file = answers.file;
-    }
-    if (!fs.existsSync(`./${date}/${file}`)) {
-        throw "File not found";
-    }
-    const answer = await inquirer.prompt([{
-        type: 'list',
-        name: 'testInput',
-        choices: async () => {
-            console.log('Creating list of probable test inputs...');
-            const resp = await axios.get(
-                `https://adventofcode.com/${env.AOC_YEAR}/day/${date}`,
-                {
-                    headers: {
-                        cookie: env.AOC_COOKIE
-                    }
-                });
-            const dom = new JSDOM(resp.data);
-            const codeBlocks = dom.window.document.querySelectorAll('code');
-            const testblocks = [];
-            for (let i = 0; i < codeBlocks.length; i++) {
-                testblocks.push(codeBlocks[i].textContent.replace(/\n/g, ''));
-            }
-            const filterdList = testblocks.filter(testblock => testblock.length > 1)
-                                    .map(item => item.toString())
-                                    .reverse();
-            return filterdList;
-        }
-    }]);
-    fs.writeFileSync(`${date}/test.txt`, answer.testInput);
-    const ext = file.split('.').slice(-1)[0];
-    if (execCmd[ext]) {
-        const child = exec(execCmd[ext](date, file, 'test.txt'));
+        const child = exec(execCmd[ext](`${env.AOC_YEAR}/${date}`, file, 'input.txt'));
         child.stdout.pipe(process.stdout);
         child.stderr.pipe(process.stderr);
     } else {
@@ -196,13 +134,13 @@ const main = async (args) => {
             return init();
 
         case 'add':
-            return add();
+            return add(env);
 
         case 'run':
             return run(args[3], args[4], env);
 
-        case 'run-test':
-            return runTest(args[3], args[4], env);
+        // case 'run-test':
+        //     return runTest(args[3], args[4], env);
 
         default:
             throw "Command not found";
