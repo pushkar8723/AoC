@@ -1,5 +1,5 @@
-Advent of Code 2019
-===================
+Advent of Code
+==============
 
 I recently came to know about [Advent of Code](https://adventofcode.com/) and thougth
 should try it out. These are my solution for various problems provided.
@@ -48,6 +48,7 @@ I implemented following programs:
 - Calculating angle of a line from a axis
 - Dealt with 0 and -0 in JavaScript
 - Got introduced to Modular Arithmetic
+- Used Chinese remainder theorem
 - Implemented Game of life
 - Traversed Inifinite Graph
 - Traversed Unknown Graph
@@ -56,3 +57,4 @@ I implemented following programs:
 - Implemented Top Down Memorization (Dynamic Programming)
 - Simulated Distributed Network
 - Implemented Backtracking!
+- Implemented Linked list
