@@ -8,19 +8,9 @@ process.stdin.on('data', function (chunk) {
         /([aeiou])/g,
         /(.)\1{1,}/g,
         /(ab|cd|pq|xy)/g,
+        /(..).*(\1){1}/g,
         /(.).\1{1}/g
     ];
-
-    const hasRepeatingPairs = (str) => {
-        for (let i = 0; i <= str.length - 4; i++) {
-            for (let j = i + 2; j <= str.length - 2; j++) {
-                if (str.substr(i, 2) === str.substr(j, 2)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     let count = 0;
     let count2 = 0;
@@ -32,7 +22,7 @@ process.stdin.on('data', function (chunk) {
         ) {
             count++;
         }
-        if (hasRepeatingPairs(line) && line.match(conditions[3])) {
+        if (line.match(conditions[3]) && line.match(conditions[4])) {
             count2++;
         }
     });
